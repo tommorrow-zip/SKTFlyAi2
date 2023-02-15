@@ -1,18 +1,56 @@
 import pymysql
+from model import *
 
-db = pymysql.connect(host="localhost", user="root", passwd="1234", db="furniture", charset="utf8")
-cur = db.cursor()
+class DAO():
+    def __init__(self):
+        self.conn = None
 
-# 가구 테이블 조회
-def furniture():
-    sql = "SELECT * FROM furniture"
-    cur.execute(sql)
-    furniture_list = cur.fetchall()
-    return furniture_list
+    def connect(self):
+        self.conn = pymysql.connect(host="localhost", user="root", passwd="1234", db="furniture", charset="utf8")
 
-# 가구분류 테이블 조회
-def furniture_classification():
-    sql = "SELECT * FROM furniture_classification"
-    cur.execute(sql)
-    furniture_classification_list = cur.fetchall()
-    return furniture_classification_list
+    def disconnect(self):
+        self.conn.close()
+
+
+    # 가구 테이블 조회
+    def furniture(self):
+        self.connect()
+        cur = self.conn.cursor()
+
+        sql = "SELECT * FROM furniture"
+        cur.execute(sql)
+        furniture_list = cur.fetchall()
+
+        self.conn.commit()
+        self.disconnect()
+
+        return furniture_list
+
+    # 가구분류 테이블 조회
+    def furniture_classification(self):
+        self.connect()
+        cur = self.conn.cursor()
+
+        sql = "SELECT * FROM furniture_classification"
+        cur.execute(sql)
+        furniture_classification_list = cur.fetchall()
+    
+        self.conn.commit()
+        self.disconnect()
+     
+        return furniture_classification_list
+
+
+
+    def getProduct(self, productIdx):
+        # TODO: Dao 에서 데이터 받아오기 #########
+        productName = "이름"
+        productPrice = 1234
+        productDescrip = "설명"
+        productUrl = "링크"
+        #####################################
+
+        getProductRes = GetProductRes(productIdx, productName, productPrice, productDescrip, productUrl)
+
+        return getProductRes
+

@@ -1,11 +1,16 @@
 from flask import Flask, render_template, request, jsonify
 import uuid, os
 
+from DAO import DAO
 from model import *
 from config.BaseResponse import *
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+
+
+Dao = DAO()
+
 
 # 메인화면
 @app.route('/')
@@ -28,14 +33,7 @@ def testapi():
 @app.route('/api/products/<productIdx>', methods=['GET'])
 def getProduct(productIdx):
     # req_data = request.get_json()
-    # TODO: Dao 에서 데이터 받아오기 #########
-    productName = "이름"
-    productPrice = 1234
-    productDescrip = "설명"
-    productUrl = "링크"
-    #####################################
-
-    getProductRes = GetProductRes(productIdx, productName, productPrice, productDescrip, productUrl)
+    getProductRes = Dao.getProduct(productIdx)
 
     #return json.dumps(BaseResponse(getProductRes.serialize()).serialize(), ensure_ascii=False, indent=4)
     return jsonify(BaseResponse(getProductRes.serialize()).serialize())
@@ -67,4 +65,4 @@ def postImage():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=9876)
