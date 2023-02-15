@@ -5,6 +5,7 @@ from model import *
 from config.BaseResponse import *
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 
 # 메인화면
 @app.route('/')
@@ -36,6 +37,7 @@ def getProduct(productIdx):
 
     getProductRes = GetProductRes(productIdx, productName, productPrice, productDescrip, productUrl)
 
+    #return json.dumps(BaseResponse(getProductRes.serialize()).serialize(), ensure_ascii=False, indent=4)
     return jsonify(BaseResponse(getProductRes.serialize()).serialize())
 
 
@@ -46,6 +48,7 @@ def getProduct(productIdx):
 '''
 @app.route('/api/images', methods=['POST'])
 def postImage():
+    # TODO: 확장자 변경 및 이미지 저장 ############################
     # req 받아오기
     file = request.files['file']
     
@@ -54,6 +57,7 @@ def postImage():
 
     # 이미지 서버 저장
     file.save(os.path.join('./UPLOAD_FOLDER', str(file_uuid)))
+    #########################################################
 
     postImageRes = PostImageRes(file_uuid)
 
