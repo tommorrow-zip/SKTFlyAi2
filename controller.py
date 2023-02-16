@@ -62,6 +62,27 @@ def postImage():
     return jsonify(BaseResponse(postImageRes.serialize()).serialize())
 
 
+'''
+이미지 결과 요청 API
+[GET] /api/images/<uuid>
+형태 : style(Style), detect(list<Detect_furniture>)
+recommend_list(list<Recommend_furniture>), recommend_furniture(Recommend_furniture)
+'''
+@app.route('/api/images/<uuid>', methods=['GET'])
+def getImage(uuid):
+    # 1.
+    # 받은 Uuid 로 다른 AI서버에 요청
+    # 
+    style = [Style("라벨1", 0.6), Style("라벨1", 0.4)]
+    detect = [Detect_furniture(2, "http://img_path2"), Detect_furniture(4, "http://img_path4")]
+    recommend_list = [Recommend_furniture(3, "가구 이름3", 333, "http://qwer3.asdf", "가구 설명3", "http://naver.com3", "http://ar.asdf3"),
+                      Recommend_furniture(4, "가구 이름4", 444, "http://qwer4.asdf", "가구 설명4", "http://naver.com4", "http://ar.asdf4")]
+
+    # style: Style, detect: list[Detect_furniture], recommend_list: list[Recommend_furniture]
+    getImageRes = GetImageRes(style, detect, recommend_list)
+    return jsonify(BaseResponse(getImageRes.serialize()).serialize())
+
+
 
 
 if __name__ == '__main__':

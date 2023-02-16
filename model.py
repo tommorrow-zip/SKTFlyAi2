@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 class GetProductRes:
     def __init__(self, productIdx, productName, productPrice, productDescrip, productUrl):
         self.productIdx = productIdx
@@ -25,24 +27,6 @@ class PostImageRes:
             'imageUuid': self.imageUuid
         }
     
-
-class GetImageRes:
-    def __init__(self, productIdx, productName, productPrice, productDescrip, productUrl):
-        self.productIdx = productIdx
-        self.productName = productName
-        self.productPrice = productPrice
-        self.productDescrip = productDescrip
-        self.productUrl = productUrl
-
-    def serialize(self):
-        return {
-            'productIdx': self.productIdx,
-            'productName': self.productName,
-            'productPrice': self.productPrice,
-            'productDescrip': self.productDescrip,
-            'productUrl': self.productUrl
-        }
-
 
 
 '''
@@ -107,4 +91,21 @@ class Recommend_furniture:
             'description': self.description,
             'url': self.url,
             'ar_path': self.ar_path
+        }
+    
+'''
+형태 : style(list<Style>), detect(list<Detect_furniture>)
+recommend_list(list<Recommend_furniture>), recommend_furniture(Recommend_furniture)
+'''
+class GetImageRes():
+    def __init__(self, style: list[Style], detect: list[Detect_furniture], recommend_list: list[Recommend_furniture]):
+        self.style = style
+        self.detect = detect
+        self.recommend_list = recommend_list
+    #list(map(lambda x:x*x, range(1,6)))
+    def serialize(self):
+        return {
+            'style': list(map(lambda x: x.serialize() , self.style)),
+            'detect': list(map(lambda x: x.serialize() , self.detect)),
+            'recommend_list': list(map(lambda x: x.serialize() , self.recommend_list)),
         }
