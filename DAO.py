@@ -1,12 +1,14 @@
 import pymysql
 from model import *
+import config.config as conf
 
 class DAO():
     def __init__(self):
         self.conn = None
 
-    def connect(self):
-        self.conn = pymysql.connect(host="localhost", user="root", passwd="1234", db="furniture", charset="utf8")
+    def connect(self):        
+        self.conn = pymysql.connect(host=conf.db['host'], user=conf.db['user'], passwd=conf.db['password'],
+                                    db="furniture", charset="utf8")
 
     def disconnect(self):
         self.conn.close()
