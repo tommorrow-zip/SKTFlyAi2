@@ -50,9 +50,10 @@ class DAO():
         productPrice = 1234
         productDescrip = "설명"
         productUrl = "링크"
+        productImgs = ["img1.url", "img2.url", "img3.url"]
         #####################################
 
-        getProductRes = GetProductRes(productIdx, productName, productPrice, productDescrip, productUrl)
+        getProductRes = GetProductRes(productIdx, productName, productPrice, productDescrip, productUrl, productImgs)
 
         return getProductRes
 

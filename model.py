@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 class GetProductRes:
-    def __init__(self, productIdx, productName, productPrice, productDescrip, productUrl):
+    def __init__(self, productIdx, productName, productPrice, productDescrip, productUrl, productImgs):
         self.productIdx = productIdx
         self.productName = productName
         self.productPrice = productPrice
         self.productDescrip = productDescrip
         self.productUrl = productUrl
+        self.productImgs = productImgs
 
     def serialize(self):
         return {
@@ -14,7 +15,8 @@ class GetProductRes:
             'productName': self.productName,
             'productPrice': self.productPrice,
             'productDescrip': self.productDescrip,
-            'productUrl': self.productUrl
+            'productUrl': self.productUrl,
+            'productImgs': self.productImgs
         }
     
 
