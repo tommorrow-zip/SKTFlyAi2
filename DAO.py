@@ -45,13 +45,31 @@ class DAO():
 
 
     def getProduct(self, productIdx):
-        # TODO: Dao 에서 데이터 받아오기 #########
-        productName = "이름"
-        productPrice = 1234
-        productDescrip = "설명"
-        productUrl = "링크"
-        productImgs = ["img1.url", "img2.url", "img3.url"]
-        #####################################
+        self.connect()
+        cur = self.conn.cursor()
+
+        sql = f"SELECT product_information, name, price, site, furniture_imgs\
+                FROM furniture\
+                INNER JOIN (\
+                    SELECT furniture_idx, group_concat(files) as furniture_imgs\
+                    FROM furniture_img\
+                    WHERE furniture_idx={productIdx}\
+                    GROUP BY furniture_idx\
+                ) furniture_img\
+                ON furniture.idx = furniture_img.furniture_idx\
+                WHERE furniture.idx={productIdx}"
+        cur.execute(sql)
+        result = cur.fetchall()
+
+        self.conn.commit()
+        self.disconnect()
+
+        productName = result[0][1]
+        productPrice = result[0][2]
+        productDescrip = result[0][0]
+        productUrl = result[0][3]
+        productImgs = str(result[0][4]).split(',')
+        
 
         getProductRes = GetProductRes(productIdx, productName, productPrice, productDescrip, productUrl, productImgs)
 
