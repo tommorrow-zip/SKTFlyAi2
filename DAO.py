@@ -76,9 +76,11 @@ class DAO():
 
             return getProductRes
         
-        except IndexError: 
+        except IndexError as e: 
+            print(result)
             return BaseResponseStatus.REQUEST_ERROR
-        except Exception:
+        except Exception as e:
+            print(e)
             return BaseResponseStatus.UNKNOWN_ERROR
             
 
