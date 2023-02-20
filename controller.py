@@ -5,6 +5,9 @@ from DAO import DAO
 from model import *
 from config.BaseResponse import *
 
+from PIL import Image
+import pillow_heif
+
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
@@ -52,12 +55,27 @@ def postImage():
     # TODO: 확장자 변경 및 이미지 저장 ############################
     # req 받아오기
     file = request.files['file']
-    
+
     # uuid 생성
     file_uuid = uuid.uuid4() # 파일 Uuid 변환... (확장자X) ==> 사용자마다 다른 확장파일 ... 는 jpg 로 확정.
 
     # 이미지 서버 저장
-    file.save(os.path.join('./UPLOAD_FOLDER', str(file_uuid)))
+    file_type = file.filename.split('.')[-1]
+    if file_type.upper() == 'HEIC':
+        heif_file = pillow_heif.read_heif(file)
+        im = Image.frombytes(
+            heif_file.mode,
+            heif_file.size,
+            heif_file.data,
+            "raw",
+        )
+
+    else:
+        im = Image.open(file).convert('RGB')
+    
+    im.save(f'./UPLOAD_FOLDER/{file_uuid}.jpg', 'jpeg')
+
+    #file.save(os.path.join('./UPLOAD_FOLDER', str(file_uuid)))
     #########################################################
 
     postImageRes = PostImageRes(file_uuid)
