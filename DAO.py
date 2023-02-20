@@ -1,6 +1,7 @@
 import pymysql
 from model import *
 import config.config as conf
+from config.BaseResponse import *
 
 class DAO():
     def __init__(self):
@@ -45,33 +46,41 @@ class DAO():
 
 
     def getProduct(self, productIdx):
-        self.connect()
-        cur = self.conn.cursor()
+        try:
+            self.connect()
+            cur = self.conn.cursor()
 
-        sql = f"SELECT product_information, name, price, site, furniture_imgs\
-                FROM furniture\
-                INNER JOIN (\
-                    SELECT furniture_idx, group_concat(files) as furniture_imgs\
-                    FROM furniture_img\
-                    WHERE furniture_idx={productIdx}\
-                    GROUP BY furniture_idx\
-                ) furniture_img\
-                ON furniture.idx = furniture_img.furniture_idx\
-                WHERE furniture.idx={productIdx}"
-        cur.execute(sql)
-        result = cur.fetchall()
+            sql = f"SELECT product_information, name, price, site, furniture_imgs\
+                    FROM furniture\
+                    INNER JOIN (\
+                        SELECT furniture_idx, group_concat(files) as furniture_imgs\
+                        FROM furniture_img\
+                        WHERE furniture_idx={productIdx}\
+                        GROUP BY furniture_idx\
+                    ) furniture_img\
+                    ON furniture.idx = furniture_img.furniture_idx\
+                    WHERE furniture.idx={productIdx}"
+            cur.execute(sql)
+            result = cur.fetchall()
 
-        self.conn.commit()
-        self.disconnect()
+            self.conn.commit()
+            self.disconnect()
 
-        productName = result[0][1]
-        productPrice = result[0][2]
-        productDescrip = result[0][0]
-        productUrl = result[0][3]
-        productImgs = str(result[0][4]).split(',')
+            productName = result[0][1]
+            productPrice = result[0][2]
+            productDescrip = result[0][0]
+            productUrl = result[0][3]
+            productImgs = str(result[0][4]).split(',')
+
+            getProductRes = GetProductRes(productIdx, productName, productPrice, productDescrip, productUrl, productImgs)
+
+            return getProductRes
         
+        except IndexError: 
+            return BaseResponseStatus.REQUEST_ERROR
+        except Exception:
+            return BaseResponseStatus.UNKNOW_ERROR
+            
 
-        getProductRes = GetProductRes(productIdx, productName, productPrice, productDescrip, productUrl, productImgs)
-
-        return getProductRes
+        
 

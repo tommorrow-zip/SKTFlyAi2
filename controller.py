@@ -35,6 +35,9 @@ def getProduct(productIdx):
     # req_data = request.get_json()
     getProductRes = Dao.getProduct(productIdx)
 
+    if isinstance(getProductRes, BaseResponseStatus):
+        return jsonify(BaseResponse(None, status=getProductRes).serialize(False))
+
     #return json.dumps(BaseResponse(getProductRes.serialize()).serialize(), ensure_ascii=False, indent=4)
     return jsonify(BaseResponse(getProductRes.serialize()).serialize())
 
