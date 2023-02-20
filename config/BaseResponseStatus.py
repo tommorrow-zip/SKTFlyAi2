@@ -39,6 +39,9 @@ class BaseResponseStatus(Enum):
     PASSWORD_ENCRYPTION_ERROR = (False, 4011, "비밀번호 암호화에 실패하였습니다.")
     PASSWORD_DECRYPTION_ERROR = (False, 4012, "비밀번호 복호화에 실패하였습니다.")
 
+    # 9000
+    UNKNOWN_ERROR = (False, 9999, "알 수 없는 에러가 발생했습니다.")
+
     
     def __init__(self, isSuccess, code, message):
         self.isSuccess = isSuccess

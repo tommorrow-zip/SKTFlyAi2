@@ -79,7 +79,7 @@ class DAO():
         except IndexError: 
             return BaseResponseStatus.REQUEST_ERROR
         except Exception:
-            return BaseResponseStatus.UNKNOW_ERROR
+            return BaseResponseStatus.UNKNOWN_ERROR
             
 
         
