@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import uuid, os
+from flask_cors import CORS, cross_origin
 
 from DAO import DAO
 from model import *
@@ -11,7 +12,7 @@ import pillow_heif
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
-
+cors = CORS(app, resources={r"*": {"origins": "*"}})
 Dao = DAO()
 
 
