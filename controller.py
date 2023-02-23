@@ -8,6 +8,7 @@ from config.BaseResponse import *
 
 from PIL import Image
 import pillow_heif
+from PIL import UnidentifiedImageError
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -53,34 +54,41 @@ def getProduct(productIdx):
 '''
 @app.route('/api/images', methods=['POST'])
 def postImage():
-    if 'file' not in request.files:
-        return jsonify({"error":"no file"})
+    if 'file' not in request.files: # REQUEST_FORM_ERROR
+        return jsonify(BaseResponse(None, status=BaseResponseStatus.REQUEST_FORM_ERROR).serialize(False))
     # req 받아오기
     file = request.files.get('file')
 
     # uuid 생성
     file_uuid = uuid.uuid4() # 파일 Uuid 변환... (확장자X) ==> 사용자마다 다른 확장파일 ... 는 jpg 로 확정.
 
-    # 이미지 서버 저장 (확장자 변환)
-    file_type = file.filename.split('.')[-1]
-    if file_type.upper() == 'HEIC':
-        heif_file = pillow_heif.read_heif(file)
-        im = Image.frombytes(
-            heif_file.mode,
-            heif_file.size,
-            heif_file.data,
-            "raw",
-        )
-    else:
-        im = Image.open(file).convert('RGB')
+    try:
+        # 이미지 서버 저장 (확장자 변환)
+        file_type = file.filename.split('.')[-1]
+        if file_type.upper() == 'HEIC':
+            heif_file = pillow_heif.read_heif(file)
+            im = Image.frombytes(
+                heif_file.mode,
+                heif_file.size,
+                heif_file.data,
+                "raw",
+            )
+        else:
+            im = Image.open(file).convert('RGB')
+        
+        #file.save(os.path.join('./UPLOAD_FOLDER', str(file_uuid)))
+        im.save(f'./static/img/uploads/{file_uuid}.jpg', 'jpeg')
+
+        postImageRes = PostImageRes(file_uuid)
+
+        return jsonify(BaseResponse(postImageRes.serialize()).serialize())
     
-    im.save(f'./static/img/uploads/{file_uuid}.jpg', 'jpeg')
-
-    #file.save(os.path.join('./UPLOAD_FOLDER', str(file_uuid)))
-
-    postImageRes = PostImageRes(file_uuid)
-
-    return jsonify(BaseResponse(postImageRes.serialize()).serialize())
+    except UnidentifiedImageError as e:
+        print(e)
+        return jsonify(BaseResponse(None, status=BaseResponseStatus.REQUEST_FORM_TYPE_ERROR).serialize(False))
+    except Exception as e:
+        print(e)
+        return jsonify(BaseResponse(None, status=BaseResponseStatus.UNKNOWN_ERROR).serialize(False))
 
 
 '''

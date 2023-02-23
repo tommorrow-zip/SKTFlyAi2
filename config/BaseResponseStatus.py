@@ -11,6 +11,9 @@ class BaseResponseStatus(Enum):
     INVALID_JWT = (False, 2002, "유효하지 않은 JWT입니다.")
     INVALID_USER_JWT = (False,2003,"권한이 없는 유저의 접근입니다.")
 
+    REQUEST_FORM_ERROR = (False,2004,"REQUEST 입력 형식(Key)이 맞지 않습니다.")
+    REQUEST_FORM_TYPE_ERROR = (False,2005,"REQUEST FORM 데이터(이미지)의 타입이 맞지 않습니다.")
+
     # users
     USERS_EMPTY_USER_ID = (False, 2010, "유저 아이디 값을 확인해주세요.")
 
