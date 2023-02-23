@@ -53,8 +53,10 @@ def getProduct(productIdx):
 '''
 @app.route('/api/images', methods=['POST'])
 def postImage():
+    if 'file' not in request.files:
+        return jsonify({"error":"no file"})
     # req 받아오기
-    file = request.files['file']
+    file = request.files.get('file')
 
     # uuid 생성
     file_uuid = uuid.uuid4() # 파일 Uuid 변환... (확장자X) ==> 사용자마다 다른 확장파일 ... 는 jpg 로 확정.
@@ -105,4 +107,4 @@ def getImage(uuid):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=9876)
+    app.run(debug=True, host='0.0.0.0', port=9875)
