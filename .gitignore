@@ -1,4 +1,6 @@
 config.py
+static/
+templates/
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/flask,python,macos
