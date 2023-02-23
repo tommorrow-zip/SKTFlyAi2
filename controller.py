@@ -5,6 +5,7 @@ from flask_cors import CORS, cross_origin
 from DAO import DAO
 from model import *
 from config.BaseResponse import *
+import config.config as conf
 
 from PIL import Image
 import pillow_heif
@@ -76,10 +77,12 @@ def postImage():
         else:
             im = Image.open(file).convert('RGB')
         
+        file_name = f"/static/img/uploads/{file_uuid}.jpg"
         #file.save(os.path.join('./UPLOAD_FOLDER', str(file_uuid)))
-        im.save(f'./static/img/uploads/{file_uuid}.jpg', 'jpeg')
+        im.save(f".{file_name}", 'jpeg')
 
-        postImageRes = PostImageRes(file_uuid)
+        file_path = f"http://{conf.db['host']}{file_name}"
+        postImageRes = PostImageRes(file_uuid, file_path)
 
         return jsonify(BaseResponse(postImageRes.serialize()).serialize())
     

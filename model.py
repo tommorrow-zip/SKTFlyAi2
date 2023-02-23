@@ -21,12 +21,14 @@ class GetProductRes:
     
 
 class PostImageRes:
-    def __init__(self, imageUuid):
+    def __init__(self, imageUuid, filePath):
         self.imageUuid = imageUuid
+        self.filePath = filePath
 
     def serialize(self):
         return {
-            'imageUuid': self.imageUuid
+            'imageUuid': self.imageUuid,
+            'filePath': self.filePath
         }
     
 
