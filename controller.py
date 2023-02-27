@@ -81,7 +81,7 @@ def postImage():
         #file.save(os.path.join('./UPLOAD_FOLDER', str(file_uuid)))
         im.save(f".{file_name}", 'jpeg')
 
-        file_path = f"http://{conf.db['host']}{file_name}"
+        file_path = f"https://{conf.db['domain']}{file_name}"
         postImageRes = PostImageRes(file_uuid, file_path)
 
         return jsonify(BaseResponse(postImageRes.serialize()).serialize())
