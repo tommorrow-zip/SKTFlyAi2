@@ -102,6 +102,10 @@ recommend_list(list<Recommend_furniture>), recommend_furniture(Recommend_furnitu
 '''
 @app.route('/api/images/<uuid>', methods=['GET'])
 def getImage(uuid):
+    if 'type' not in request.args:
+        type_ = 0
+    else:
+        type_ = request.form.get("type")
     # 1.
     # 받은 Uuid 로 다른 AI서버에 요청
     # 
