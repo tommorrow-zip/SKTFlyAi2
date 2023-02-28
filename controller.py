@@ -161,7 +161,7 @@ def getImage(uuid):
         file_path = f"/static/img/detect/{file_uuid}.jpg"
         cv2.imwrite(file_path, img)
         
-        detect.append(Detect_furniture(idx, file_path))
+        detect.append(Detect_furniture(idx, f"https://{conf.db['domain']}{file_path}"))
     
     
 
