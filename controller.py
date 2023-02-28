@@ -159,7 +159,7 @@ def getImage(uuid):
         file_uuid = uuid + str(i)
         # 파일 저장
         file_path = f"/static/img/detect/{file_uuid}.jpg"
-        cv2.imwrite(file_path, img)
+        cv2.imwrite(f'.{file_path}', img)
         
         detect.append(Detect_furniture(idx, f"https://{conf.db['domain']}{file_path}"))
     
