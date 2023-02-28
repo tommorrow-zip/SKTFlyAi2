@@ -143,7 +143,7 @@ def getImage(uuid):
     # 디텍션 결과
     #print(f'type: {type(res)}, len: {len(res)}')
     objects = res["detected_object_location"]
-    detect = [Detect_furniture(0, "linkaaasdf")]
+    detect = []
 
     
     input_img = Image.open(f'./static/img/uploads/{uuid}.jpg').convert("RGB")
