@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+import requests
 import uuid, os
 from flask_cors import CORS, cross_origin
 
@@ -11,12 +12,35 @@ from PIL import Image
 import pillow_heif
 from PIL import UnidentifiedImageError
 
+import cv2, numpy as np
+import json
+
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 cors = CORS(app, resources={r"*": {"origins": "*"}})
 Dao = DAO()
 
+
+CLASSIFIER_LABELS = [
+    "Asian",
+    "Beach",
+    "Contemporary",
+    "Craftsman",
+    "Eclectic",
+    "Farmhouse",
+    "Industrial",
+    "Mediterranean",
+    "Midcentury",
+    "Modern",
+    "Rustic",
+    "Scandinavian",
+    "Southwestern",
+    "Traditional",
+    "Transitional",
+    "Tropical",
+    "Victorian",
+]
 
 # 메인화면
 @app.route('/')
@@ -106,18 +130,99 @@ def getImage(uuid):
         type_ = 0
     else:
         type_ = request.form.get("type")
-    # 1.
-    # 받은 Uuid 로 다른 AI서버에 요청
-    # 
-    style = [Style("라벨1", 0.6), Style("라벨1", 0.4)]
-    detect = [Detect_furniture(2, "http://img_path2"), Detect_furniture(4, "http://img_path4")]
-    recommend_list = [Recommend_furniture(3, "가구 이름3", 333, "http://qwer3.asdf", "가구 설명3", "http://naver.com3", "http://ar.asdf3"),
-                      Recommend_furniture(4, "가구 이름4", 444, "http://qwer4.asdf", "가구 설명4", "http://naver.com4", "http://ar.asdf4")]
 
+    url = "http://34.64.109.102:3000/unified"
+    
+
+    files = {'image': open(f'./static/img/uploads/{uuid}.jpg', 'rb')}
+    res = requests.post(url, files=files)
+    res = res.json()
+
+
+    
+    # 디텍션 결과
+    #print(f'type: {type(res)}, len: {len(res)}')
+    objects = res["detected_object_location"]
+    detect = [Detect_furniture(0, "linkaaasdf")]
+
+    
+    input_img = Image.open(f'./static/img/uploads/{uuid}.jpg').convert("RGB")
+
+    img = np.array(input_img, dtype=np.uint8)
+    layers = make_bbox_images_json(objects, img)
+    for i, ly in enumerate(layers):
+        # {"label": label, "unique_id": obj_id, "img": clipped_result}
+        idx = ly['label']
+        img = ly['img']
+
+        # uuid 사용
+        file_uuid = uuid + str(i)
+        # 파일 저장
+        file_path = f"/static/img/detect/{file_uuid}.jpg"
+        cv2.imwrite(file_path, img)
+        
+        detect.append(Detect_furniture(idx, file_path))
+    
+    
+
+    # 스타일
+    styles = res['style']
+    style = []
+    for i_, (stt) in enumerate(styles.items()):
+        #print(stt)
+        for i, st in enumerate(stt[1]):
+            if st != 0.0:
+                style.append(Style(CLASSIFIER_LABELS[i], st))
+        break
+    #print(style)
+    
+
+
+    # 리커멘드
+    recomm = res['recom']
+    recommend_list = []
+    for i_, (stt) in enumerate(recomm.items()):
+        for rl in stt[1]: # productName, productPrice, productDescrip, productUrl
+            getprod = Dao.getProduct(rl)
+            # productIdx, productName, productPrice, productDescrip, productUrl, productImgs
+            recommend_list.append(Recommend_furniture(rl, getprod.productName, getprod.productPrice, getprod.productImgs[0], getprod.productDescrip, getprod.productUrl, ""))
+        
+        break
+
+
+    
+    
+    
     # style: Style, detect: list[Detect_furniture], recommend_list: list[Recommend_furniture]
     getImageRes = GetImageRes(style, detect, recommend_list)
     return jsonify(BaseResponse(getImageRes.serialize()).serialize())
 
+
+
+def make_bbox_images_json(detected_objects, img):
+    layers = []
+
+    for i_, (label, objs) in enumerate(detected_objects.items()):
+        objs = dict(objs)
+
+        for obj_id, segms in objs.items():
+            x, y, w, h = segms["bbox"]
+            clipped_result = np.zeros(shape=img.shape, dtype=np.uint8)
+
+            for segm in segms["segms"]:
+                s = np.array(
+                    list(zip(segm["segm"]["x"], segm["segm"]["y"])), dtype=np.int32
+                )
+                mask = np.zeros_like(clipped_result)
+                mask = cv2.fillPoly(mask, [s], (255, 255, 255))
+                clipped_result = cv2.add(clipped_result, cv2.bitwise_and(img, mask))
+
+            clipped_result = clipped_result[y: y + h, x: x + w]
+            clipped_result = cv2.resize(clipped_result, (100, 100))
+
+            layers.append({"label": label, "unique_id": obj_id, "img": clipped_result})
+            
+    return layers
 
 
 

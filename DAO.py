@@ -82,7 +82,35 @@ class DAO():
         except Exception as e:
             print(e)
             return BaseResponseStatus.UNKNOWN_ERROR
-            
+    
+
+    def foo(self, productIdx):
+        try:
+            # name, price, image, descr, c_url
+            self.connect()
+            cur = self.conn.cursor()
+            print(f'idx ::: {productIdx}')
+            sql = f"SELECT product_information, name, price, site FROM furniture WHERE furniture.idx={int(float(productIdx))}"
+
+            cur.execute(sql)
+            result = cur.fetchall()
+
+            self.conn.commit()
+            self.disconnect()
+
+            productName = result[0][1]
+            productPrice = result[0][2]
+            productDescrip = result[0][0]
+            productUrl = result[0][3]
+
+            return (productName, productPrice, productDescrip, productUrl)
+        
+        except IndexError as e: 
+            print(result)
+            return BaseResponseStatus.REQUEST_ERROR
+        except Exception as e:
+            print(e)
+            return BaseResponseStatus.UNKNOWN_ERROR
 
         
 
